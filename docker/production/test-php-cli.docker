@@ -7,8 +7,8 @@ WORKDIR /app
 # Мы возьмём папку из структуры и скопируем её в рабочую папку
 COPY ./bin ./bin
 
-# Если запускать сборку из того же места где лежит Dockerfile, то команда будет такой:
-# docker build --file=Dockerfile --tag test-php-cli ./
+# Если запускать сборку из корня проекта, то команда будет такой:
+# docker build --file=docker/production/tst-php-cli.docker --tag test-php-cli ./
 # --tag test-php-cli говорит нам как этот контейнер будет называться в докере
 # Мы потом сможем вызвать этот контейнер например таким обазом
 # docker run --rm test-php-cli php bin/app.php

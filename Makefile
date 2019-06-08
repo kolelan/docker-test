@@ -10,3 +10,8 @@ cli:
 web:
 	docker run --rm -v ${PWD}/public:/var/www/html -p 8080:80 php:7.2-apache
 
+prod-build:
+	docker build --file=docker/production/test-php-cli.docker --tag test-php-cli ./
+
+prod-cli:
+	docker run --rm test-php-cli php bin/app.php

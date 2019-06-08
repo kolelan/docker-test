@@ -1,2 +1,2 @@
 <?php
-echo "Hello world",PHP_EOL;
+echo "Hello prod-build",PHP_EOL;
