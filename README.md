@@ -5,6 +5,7 @@
 Для начала работы с этой сборкой необходимо убедится, что у вас установлен ```docker```. 
 Для этого в консоли в корне сборки пишем команду ```docker --version```. В файле Makefile 
 находятся команды которые нужно вводить в консоли, или запускать их с помощью утилиты ```make```.
+
 В этом релизе мы создали проект, который разделяет окружение на development и production и для
 каждого окружения мы можем запускать свои контейнеры, которые собираются по разным правилам. Например,
 для development окружения не нужно копировать файлы проекта в образ и во время запуска контейнера 
@@ -20,6 +21,6 @@ deploy на рабочий сервер или в репозиторий docker
 
 ## Не получилось?
 Список документации по работе с докер:
-1. ```https://docs.docker.com/get-started/``` Docs Docker
-2. ```http://deepark.ru/?tag=Docker``` Статьи помеченные маркером Docker 
-3. ```https://ru.wikipedia.org/wiki/Docker``` Wiki Docker
+1. https://docs.docker.com/get-started/ Docs Docker
+2. http://deepark.ru/?tag=Docker Статьи помеченные маркером Docker 
+3. https://ru.wikipedia.org/wiki/Docker Wiki Docker
