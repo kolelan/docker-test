@@ -69,3 +69,50 @@ prod-build:
 # -v ${PWD}/manager:/app  делать не нужно, потому что там уже есть все файлы
 prod-cli:
 	docker run --rm manager-php-cli php bin/app.php
+
+# ######################################################################################################################
+# ######################################      docker-compose      ######################################################
+# ######################################################################################################################
+
+up: docker-up
+# Команда всё останавливает получает новые дистрибутивы, собирает по новой и поднимает всё самое свежее
+init: docker-down docker-pull docker-build docker-up
+
+
+# В этом месте запускаем docker-compose
+# -d говорит что нужно запустить в фоновом режиме
+# --build не только поднимать но и пересобирать.
+docker-up:
+	docker-compose up --build -d
+
+# --remove-orphans  говорит что если docker-compose.yml изменён то всё равно завершить (остановить и удалить)
+# все контейнеры которые связаны с удаляющимися
+docker-down:
+	docker-compose down --remove-orphans
+
+docker-pul:
+	docker-compose pull
+
+docker-build:
+	docker-compose build
+
+docker-cli:
+	docker-compose run --rm manager-php-cli php bin/app.php
+
+build-production:
+	docker build --pull --file=manager/docker/production/nginx.docker --tag ${REGISTRY_ADDRESS}/manager-nginx:${IMAGE_TAG} manager
+	docker build --pull --file=manager/docker/production/php-fpm.docker --tag ${REGISTRY_ADDRESS}/manager-php-fpm:${IMAGE_TAG} manager
+	docker build --pull --file=manager/docker/production/php-cli.docker --tag ${REGISTRY_ADDRESS}/manager-php-cli:${IMAGE_TAG} manager
+
+push-production:
+	docker push ${REGISTRY_ADDRESS}/manager-nginx:${IMAGE_TAG}
+	docker push ${REGISTRY_ADDRESS}/manager-php-fpm:${IMAGE_TAG}
+	docker push ${REGISTRY_ADDRESS}/manager-php-cli:${IMAGE_TAG}
+
+deploy-production:
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'rm -rf docker-compose.yml .env'
+	scp -o StrictHostKeyChecking=no -P ${PRODUCTION_PORT} docker-compose-production.yml ${PRODUCTION_HOST}:docker-compose.yml
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "REGISTRY_ADDRESS=${REGISTRY_ADDRESS}" >> .env'
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'echo "IMAGE_TAG=${IMAGE_TAG}" >> .env'
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'docker-compose pull'
+	ssh -o StrictHostKeyChecking=no ${PRODUCTION_HOST} -p ${PRODUCTION_PORT} 'docker-compose --build -d'
