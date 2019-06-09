@@ -76,7 +76,8 @@ prod-cli:
 
 up: docker-up
 # Команда всё останавливает получает новые дистрибутивы, собирает по новой и поднимает всё самое свежее
-init: docker-down docker-pull docker-build docker-up
+init: docker-down docker-pull docker-build docker-up manager-init
+#init: docker-down docker-pull docker-build docker-up
 
 
 # В этом месте запускаем docker-compose
@@ -90,7 +91,7 @@ docker-up:
 docker-down:
 	docker-compose down --remove-orphans
 
-docker-pul:
+docker-pull:
 	docker-compose pull
 
 docker-build:
@@ -99,10 +100,16 @@ docker-build:
 docker-cli:
 	docker-compose run --rm manager-php-cli php bin/app.php
 
+manager-init: manager-composer-install
+
+# Composer install
+manager-composer-install:
+	docker-compose run --rm manager-php-cli composer install
+
 build-production:
-	docker build --pull --file=manager/docker/production/nginx.docker --tag ${REGISTRY_ADDRESS}/manager-nginx:${IMAGE_TAG} manager
 	docker build --pull --file=manager/docker/production/php-fpm.docker --tag ${REGISTRY_ADDRESS}/manager-php-fpm:${IMAGE_TAG} manager
 	docker build --pull --file=manager/docker/production/php-cli.docker --tag ${REGISTRY_ADDRESS}/manager-php-cli:${IMAGE_TAG} manager
+#	docker build --pull --file=manager/docker/production/nginx.docker --tag ${REGISTRY_ADDRESS}/manager-nginx:${IMAGE_TAG} manager
 
 push-production:
 	docker push ${REGISTRY_ADDRESS}/manager-nginx:${IMAGE_TAG}

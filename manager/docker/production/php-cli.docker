@@ -1,15 +1,15 @@
-# Из какого дистрибутива собираем образ
 FROM php:7.2-cli
 
-# Какая рабочая папка образа
+RUN apt-get update && apt-get install -y unzip
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
 WORKDIR /app
 
-# Мы возьмём папку из структуры и скопируем её в рабочую папку
-COPY ./bin ./bin
+COPY ./composer.json ./composer.lock ./
 
-# Если запускать сборку из корня проекта, то команда будет такой:
-# docker build --file=docker/production/tst-php-cli.docker --tag test-php-cli ./
-# --tag test-php-cli говорит нам как этот контейнер будет называться в докере
-# Мы потом сможем вызвать этот контейнер например таким обазом
-# docker run --rm test-php-cli php bin/app.php
-# Так же мы увидем этот образ когда наберём docker images в консоли
+RUN composer install --no-dev --no-scripts --prefer-dist --optimize-autoloader
+
+COPY ./ ./
