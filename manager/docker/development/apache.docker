@@ -1,0 +1,21 @@
+# Из какого дистрибутива собираем образ
+FROM php:7.2-apache
+
+# Включаем модуль apache rewrite
+RUN a2enmod rewrite
+
+# Устанавливаем переменную окружения
+ENV APACHE_DOCUMENT_ROOT /app/public
+
+# Производим замены во всех конфигурационных файлах apache
+# Те. в оригинальных файлах контейнера все пути которые там есть и ссылаются на стандартное размещение
+# меняем на то, которое нам нужно. И у нас сайт будет расположен в папке /app/public а не в /var/www/html
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Определяем рабочую папку приложения
+WORKDIR /app
+
+# Не копируем данны веб приложения в папку контейнера
+# потому что это среда разработки и мы хотим видеть изменения, которые мы вносим во время работы
+# COPY ./bin ./bin
